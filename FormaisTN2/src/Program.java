@@ -27,7 +27,7 @@ public class Program {
 
 	// a = 0, b = 1, c = 2, d = 3
 	public static void Start(String sentense) {
-		boolean[] finalStates = {false, false, false, true, false, false, true};
+		boolean[] finalStates = {false, false, false, false, true, false, true};
 		int[][] transitionTable = {{1, 2, -1, -1}, {0, 3, 4, -1}, {-1, 3, 4, -1}, {-1, 2, -1, -1}, {-1, -1, 5, 6}, {-1, -1, 4, -1}, {-1, -1, -1, 6}};
 		
 		while(!sentense.isEmpty()) {
@@ -40,14 +40,17 @@ public class Program {
 					case '-' :
 					case '*' :
 					case '/' :
-						if(state != -1 && !currentSentense.isEmpty())
+						if(state != -1 && state != -2 && !currentSentense.isEmpty())
 							if(finalStates[state])
 								accept(currentSentense);
 							else
 								reject(currentSentense);
 						else
-							if(!currentSentense.isEmpty())
+							if(!currentSentense.isEmpty() && state != -2)
 								reject(currentSentense);
+							else
+								if(!currentSentense.isEmpty())
+									invalid(currentSentense);
 						
 						operator(currentEntry + "");
 						currentSentense = "";
@@ -58,24 +61,34 @@ public class Program {
 					case 'b' :
 					case 'c' :
 					case 'd' :
-						if(state != -1)
+						if(state != -1 && state != -2)
 							state = transitionTable[state][currentEntry - 97];
 						break;
 					default :
-						state = -1;
+						if(currentSentense.isEmpty())
+							state = -2;
+						else
+							if(state != -2)
+								state = -1;
+							else
+								state = -2;
 				}
 				if(currentEntry != '\0')
 					currentSentense = currentSentense + currentEntry;
 				sentense = sentense.substring(1);
 			}
-			if(state != -1 && !currentSentense.isEmpty())
+			if(state != -1 && state != -2 && !currentSentense.isEmpty())
 				if(finalStates[state])
 					accept(currentSentense);
 				else
 					reject(currentSentense);
 			else
-				if(!currentSentense.isEmpty())
+				if(!currentSentense.isEmpty() && state != -2)
 					reject(currentSentense);
+				else
+					if(!currentSentense.isEmpty())
+						invalid(currentSentense);
+				
 			if(!sentense.isEmpty())
 				sentense = sentense.substring(1);
 		}
